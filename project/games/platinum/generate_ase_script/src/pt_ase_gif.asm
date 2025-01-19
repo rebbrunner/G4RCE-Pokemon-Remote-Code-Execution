@@ -7,12 +7,18 @@
 _start:
 push {r1-r7, lr}
 
-mov r2, #0x1F
+mov r2, #0x2A
 ldrh r1, [r3, r2] @ r1 = diff gift id offset & dot artist offset 0xA44C
 
 sub r3, #0x15
 mov r2, #0x6
 strb r2, [r3]
+
+mov r4, #0x40
+ldrh r5,[r3,r4] @ npc event id
+add r4,#0x6
+ldr r4,[r3,r4]  @ gift id -> npc event id offset
+str r5,[r3,r4]
 
 @ enable dots artist
 sub r1, r3, r1
@@ -32,5 +38,6 @@ _return:
 pop {r1-r7, pc}
 
 _data:
-@ .word 0x0203E76D                        @ end script mode function
-.word 0xA44E                              @ diff gift id offset & dot artist offset 0xA44C
+.hword 0xA44E                             @ diff gift id offset & dot artist offset
+.hword 0x9C4E                             @ npc event id value to write
+.word  0x18640                            @ diff gift id offset & npc event id (base + 0x23C14)
