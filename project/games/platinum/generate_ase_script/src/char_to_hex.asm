@@ -1,45 +1,48 @@
 .arch armv5te
 .text
-.code   16
+.code 16
 .thumb
 .global start
 
 _start:
-push {r0-r7,lr}
+push {r0-r7, lr}
 
 @ load data
-add r3,#0x31
-ldrh r0,[r3]
+add r3,#0x2D
+ldr r0,[r3]
+ldr r0,[r0]
+ldrh r1,[r3,#0x4]
+ldrh r2,[r3,#0x6]
+add r0,r0,r1
 
-mov r1,#0x4         @ Initial offset location
-lsl r1,#0xC
-add r2,r1,#0x1      @ Read location
-ldrb r3,[r1]
-add r3,r1,r3        @ Write location
-mov r4,#0x4         @ Loop counter
+ldrb r2,[r0]                        @ r2 = read -> write offset
+add r3,r0,#0x1                      @ r3 = read location
+add r4,r2,r0                        @ r4 = write location
+mov r5,#0x4                         @ r5 = loop counter
 
 _loop:
 cmp r4,#0x0
 beq _end
 sub r4,r4,#0x1
 
-ldrh r5,[r2]
-ldrh r6,[r2,#0x2]
-sub r5,r5,r0
-sub r6,r6,r0
-lsl r5,r5,#0x4
-add r5,r5,r6
-strb r5,[r3]
-add r3,r3,#0x1
-add r2,r2,#0x4
-@b _loop
+ldrh r6,[r3]
+ldrh r7,[r3,#0x2]
+sub r6,r6,r1
+sub r7,r7,r1
+lsl r6,r6,#0x4
+add r6,r6,r7
+strb r6,[r4]
+add r3,r3,#0x8
+add r4,r4,#0x8
+@b _end
 
-sub r3,r3,r1
-strb r3,[r1]
+sub r1,r4,r0
+strb r1,[r0]
 
 _end:
-pop {r0-r7,pc}
+pop {r0-r7, pc}
 
 _data:
+.word 0x2000000                     @ base pointer
+.hword 0x5BBC                       @ base -> player signature offset
 .hword 0x121
-.hword 0x0
