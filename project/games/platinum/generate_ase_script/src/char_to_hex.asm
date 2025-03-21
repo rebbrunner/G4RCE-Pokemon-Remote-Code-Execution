@@ -18,7 +18,7 @@ add r0,r0,r4
 ldrb r2,[r0]                        @ r2 = read -> write offset
 add r3,r0,#0x2                      @ r3 = read location
 add r4,r2,r0                        @ r4 = write location
-mov r5,#0x2                         @ r5 = loop counter
+mov r5,#0x4                         @ r5 = loop counter
 
 _loop:
 cmp r5,#0x0
