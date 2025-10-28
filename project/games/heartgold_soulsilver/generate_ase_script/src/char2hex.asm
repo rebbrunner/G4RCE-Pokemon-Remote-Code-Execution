@@ -8,7 +8,7 @@ _start:
 push {r0-r7, lr}
 
 @ load data
-add r3,#0x45
+add r3,#0x69
 ldmia r3,{r0,r1,r2,r4,r5}
 push {r2,r4,r5}
 ldr r0,[r0]                      @ load base pointer
@@ -27,16 +27,36 @@ cmp r5,#0x41
 bne _trigger
 
 _setup_write:
-mov r5,#0x2
-add r4,r4,r5
+add r4,r4,#0x2
 bl _decode
-push {r5}
-mov r5,#0x4
-add r4,r4,r5
+mov r7,r5
+add r4,r4,#0x4
 bl _decode
-pop {r4}                        @ r4 = execution -> current write offset; r5 = size;
+pop {r2}                        
+add r2,r2,r0                    @ r2 = location; r7 = size;
+add r4,r4,#0x22
 
 _write:
+cmp r7,#0x0                     @ if size 0; end
+beq _end
+sub r7,r7,#0x1                  @ decrement loop counter (size)
+
+mov r5,#0x5
+push {r5}
+
+_mini_loop:
+pop {r5}
+sub r5,r5,#0x1
+cmp r5,#0x0
+beq _write
+push {r5}
+
+bl _decode                      @ decode r4 command into r5 (destroys data in r6 as well)
+strb r2,r5                      @ store value of r5 in location r2
+add r4,r4,#0x4                  @ increment read location
+add r2,r2,#0x2                  @ increment write location
+b _mini_loop
+
 pop {r2}
 b _end
 
@@ -61,4 +81,7 @@ _data:
 .word 0x121                     @ character encoding value
 .word 0x9E4C                    @ base -> gift offset
 .word 0x21718                   @ base -> box name
-.word 0x9999                    @ base -> execution spot
+.word 0x9ED8                    @ base -> execution spot
+
+@ test payload
+@ W0403 02 01
