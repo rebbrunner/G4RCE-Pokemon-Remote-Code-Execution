@@ -5,47 +5,54 @@
 .global start
 
 _start:
-push {r0-r7, lr}
+push {r0-r7,lr}
 
-@ load data
-add r3,#0x81
-ldmia r3,{r0,r1,r2,r4,r5,r6}
-push {r2,r4,r5,r6}
-ldr r0,[r0]                      @ load base pointer
-@ stack order: gift -> box name -> execution trigger
+@ load base pointer
+add r3,#0xDC
+ldr r0,[r3,#0x0]
+ldr r0,[r0]                     @ loaded base poniter
 
-@ reset gift
-pop {r2}                         @ stack: box name -> execution trigger
-mov r5,#0x6
-strb r5,[r0,r2]
+@ Reset gift - o
+ldr r1,[r3,#0x4]                @ gift location
+mov r2,#0x6
+strb r2,[r0,r1]
 
-_check_op_mode:
-pop {r2}                         @ stack: execution trigger
-add r4,r0,r2
-ldrb r5,[r4]
-cmp r5,#0x41
-beq _setup_write
-cmp r5,#0x2B
-beq _ASEMODE
-b _trigger
+@ Setup NPC ASE - o
+ldr r1,[r3,#0x8]                @ NPC location
+ldrh r2,[r3,#0xC]
+strh r2,[r0,r1]
 
-_setup_write:
-add r4,r4,#0x2
+@ Check OP mode - o
+ldr r1,[r3,#0x10]
+ldrb r2,[r0,r1]
+cmp r2,#0x2B
+bne _WRITER
+
+@ ASE mod - o
+ldr r1,[r3,#0x14]               @ base -> execution spot (-)
+ldr r2,[r3,#0x18]               @ base -> ASE return point
+add r1,r0,r1
+str r1,[r0,r2]
+b _end
+
+_WRITER:
+ldr r4,[r3,#0x1C]
+add r1,r1,#0x2
 bl _decode
 mov r7,r5
-add r4,r4,#0x4
+add r1,r1,#0x4
 bl _decode
-pop {r2}                        
+ldr r2,[r3,#0x14]                        
 add r2,r2,r0                    @ r2 = location; r7 = size;
 add r2,r2,r5
-add r4,r4,#0xA
+add r1,r1,#0xA
 
 _write:
 cmp r7,#0x0                     @ if size 0; end
 beq _p_end
 sub r7,r7,#0x1                  @ decrement loop counter (size)
 
-add r4,r4,#0x18
+add r1,r1,#0x18
 mov r5,#0x5
 push {r5}
 
@@ -58,46 +65,35 @@ push {r5}
 
 bl _decode                      @ decode r4 command into r5 (destroys data in r6 as well)
 strb r5,[r2]                      @ store value of r5 in location r2
-add r4,r4,#0x4                  @ increment read location
+add r1,r1,#0x4                  @ increment read location
 add r2,r2,#0x1                  @ increment write location
 b _mini_loop
+
+_decode:
+ldrh r5,[r1]
+ldrh r6,[r1,#0x2]
+sub r5,r5,r4
+sub r6,r6,r4
+lsl r5,r5,#0x4
+add r5,r5,r6
+bx lr
 
 _p_end:
 pop {r2}
 b _end
 
-_trigger:
-pop {r2,r4}                       @ stack fixed!
-add r1,r0,r2
-blx r1
-b _end
-
-_ASEMODE:
-pop {r2,r4}
-add r5,r0,r2
-add r1,r0,r4
-str r5,[r1]
-b _end
-
-_decode:
-ldrh r5,[r4]
-ldrh r6,[r4,#0x2]
-sub r5,r5,r1
-sub r6,r6,r1
-lsl r5,r5,#0x4
-add r5,r5,r6
-bx lr
-
 _end:
-pop {r0-r7, pc}
+pop {r0-r7,pc}
 
 _data:
+nop                             @ odd needs nop, even no nop
 .word 0x2111880                 @ base pointer
-.word 0x121                     @ character encoding value
 .word 0x9E4C                    @ base -> gift offset
+.word 0x26250                   @ base -> NPC script offset
+.word 0x9C9C                    @ NPC script offset -> nickname
 .word 0x21718                   @ base -> box name
 .word 0x4548                    @ base -> execution spot (-)
 .word 0x2AA50                   @ base -> ASE return point
+.word 0x121                     @ character encoding value
 
-@ test payload
 @ W0403 02 01
