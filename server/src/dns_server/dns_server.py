@@ -13,7 +13,7 @@ from ..log_handler.log_handler import LogHandler
 dns_logging = LogHandler('dns_server', 'network.log', level=logging.INFO).get_logger()
 
 class DNSServer:
-    def __init__(self, dns_ip:str="178.62.43.212") -> None:
+    def __init__(self, dns_ip:str=os.environ.get('HOST_IP_ADDRESS').replace(' ', '')) -> None:
         self.dns_ip = dns_ip
 
         self.proxy_ip = self.get_proxy_ip()
