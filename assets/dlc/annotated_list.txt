@@ -1,0 +1,5 @@
+// Mew - 53gs.myg					936
+// Enigma Stone - 54gs.myg					936
+// Celebi - 62dppgsUS.myg					936
+hgss_ace_bootstrap.myg					936
+hgss_ace.myg					936
