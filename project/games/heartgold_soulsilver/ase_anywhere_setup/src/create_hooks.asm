@@ -30,9 +30,8 @@ bl calcImmediates
 strh upper,[start]
 strh lower,[start,#0x2]
 
-mov temp,target
-mov target,start
-mov start,temp
+ldr target,_hookTo
+mov start,target
 bl calcImmediates
 strh upper,[start,#0x2]
 strh lower,[start,#0x4]
@@ -75,6 +74,8 @@ _data:
 .word 0x2111880
 _hookPoint:
 .word 0x020400d6
+_hookTo:
+.word 0x020400e8
 _payloadOffset:
 .word 0x9F28
 _hookStart:
