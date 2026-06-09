@@ -16,24 +16,26 @@ _start:
 .code	16
 .thumb_func
 
-push {r0-r7}
+push {r0-r7,lr}
 
 @ load base, target, and hook locations
 ldr base,_data
 ldr base,[base]
-ldrh target,_payloadOffset
-ldr target,[base,target]
+ldr target,_payloadOffset
+add target,base,target
 ldr start,_hookPoint
 
 @ create hook
 bl calcImmediates
-str return,[start]
+strh upper,[start]
+strh lower,[start,#0x2]
 
 mov temp,target
 mov target,start
 mov start,temp
 bl calcImmediates
-str return,[target,#0x4]
+strh upper,[start,#0x2]
+strh lower,[start,#0x4]
 
 b _end
 
@@ -41,16 +43,18 @@ calcImmediates:
 @ calc offset
 sub return,target,start
 sub return,return,#0x4
-asr return,target,#0x1
+asr return,#0x1
 
 @ extract lower
-mov lower,#0x7F
-lsl lower,#0x8
-add lower,#0xF
+mov temp,#0x7F
+lsl temp,#0x4
+add temp,#0xF
+mov lower,temp
 and lower,lower,return
 
 @ extract upper
-asr return,#0xb
+lsr upper,return,#0xb
+and upper,upper,temp
 
 @ add opcode lower
 mov temp,#0xF8
@@ -61,30 +65,10 @@ orr lower,lower,temp
 mov temp,#0xF0
 lsl temp,#0x8
 orr upper,upper,temp
-
-@ flip endian
-mov return,lower
-bl byteFlip
-mov lower,return
-mov return,upper
-bl byteFlip
-mov upper,return
-
-@ combine into single instruction
-lsl return,upper,#0x10
-add return,return,lower
-bx lr
-
-byteFlip:
-mov temp,return
-lsr temp,#0x8
-lsl return,#0x18
-lsr return,#0x10
-orr return,return,temp
 bx lr
 
 _end:
-pop {r0-r7}
+pop {r0-r7,pc}
 
 .balign 4
 _data:
@@ -92,4 +76,8 @@ _data:
 _hookPoint:
 .word 0x020400d6
 _payloadOffset:
-.hword 0x9F28
+.word 0x9F28
+_hookStart:
+.word 0x0023
+_hookEnd:
+.word 0x201c
