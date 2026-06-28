@@ -15,8 +15,8 @@ nop
 nop
 
 @ if script = target script, hijack script context
-mov r1,#0x22
-mov r2,#0x66
+mov r1,#0xF0
+mov r2,#0x0D
 lsl r1,#0x8
 add r1,r1,r2
 cmp r6,r1

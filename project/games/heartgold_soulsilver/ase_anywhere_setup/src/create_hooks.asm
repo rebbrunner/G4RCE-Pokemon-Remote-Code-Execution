@@ -18,6 +18,28 @@ _start:
 
 push {r0-r7,lr}
 
+@ switch menu for pokedex to retire
+adr r0,FUN_handlePokedex
+ldr r1,[r0]
+add r0,#0x4
+ldr r2,[r0]
+str r2,[r1]
+add r1,#0x4
+add r0,#0x4
+ldr r2,[r0]
+str r2,[r1]
+
+@ make retire call invalid script ID
+adr r0,FUN_handleRetire
+ldr r1,[r0]
+add r0,#0x4
+ldr r2,[r0]
+str r2,[r1]
+add r1,#0x8
+add r0,#0x4
+ldr r2,[r0]
+str r2,[r1]
+
 @ load base, target, and hook locations
 ldr base,_data
 ldr base,[base]
@@ -82,3 +104,13 @@ _hookStart:
 .word 0x0023
 _hookEnd:
 .word 0x201c
+
+FUN_handlePokedex:
+.word 0x203C8FC
+.word 0x00B500F0
+.word 0xC3FD00BD
+
+FUN_handleRetire:
+.word 0x0203d4b6
+.word 0xf0218940
+.word 0x0D31281C
