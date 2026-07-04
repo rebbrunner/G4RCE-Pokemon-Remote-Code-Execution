@@ -33,9 +33,11 @@ str r2,[r1]
 adr r0,FUN_handleRetire
 ldr r1,[r0]
 add r0,#0x4
-ldr r2,[r0]
-str r2,[r1]
-add r1,#0x8
+ldrh r2,[r0]
+strh r2,[r1]
+ldrh r2,[r0,#0x2]
+strh r2,[r1,#0x2]
+add r1,#0x6
 add r0,#0x4
 ldr r2,[r0]
 str r2,[r1]
@@ -52,11 +54,12 @@ bl calcImmediates
 strh upper,[start]
 strh lower,[start,#0x2]
 
-ldr target,_hookTo
 mov start,target
+ldr target,_hookTo
+add start,#0x2
 bl calcImmediates
-strh upper,[start,#0x2]
-strh lower,[start,#0x4]
+strh upper,[start]
+strh lower,[start,#0x2]
 
 b _end
 
@@ -99,7 +102,7 @@ _hookPoint:
 _hookTo:
 .word 0x020400e8
 _payloadOffset:
-.word 0x9F28
+.word 0x9F10
 _hookStart:
 .word 0x0023
 _hookEnd:
@@ -107,10 +110,11 @@ _hookEnd:
 
 FUN_handlePokedex:
 .word 0x203C8FC
-.word 0x00B500F0
-.word 0xC3FD00BD
+.word 0xF000B500
+.word 0xBD00FDC3
 
 FUN_handleRetire:
 .word 0x0203d4b6
-.word 0xf0218940
-.word 0x0D31281C
+.hword 0x21f0
+.hword 0x0209
+.word 0x310D0000
