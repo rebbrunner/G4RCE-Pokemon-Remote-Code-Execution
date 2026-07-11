@@ -91,7 +91,7 @@ _nickname_offset:
 _box_name_offset:
 .word 0x21718                   @ base -> box name
 _sig_offset:
-.word 0x4548                    @ base -> execution spot (-)
+.word 0x4544                    @ base -> execution spot (-)
 _const_char_encoding_val:
 .word 0x121                     @ character encoding value
 
