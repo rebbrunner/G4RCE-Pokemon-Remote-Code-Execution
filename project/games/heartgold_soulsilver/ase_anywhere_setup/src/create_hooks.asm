@@ -102,7 +102,7 @@ _hookPoint:
 _hookTo:
 .word 0x020400e8
 _payloadOffset:
-.word 0x9F10
+.word 0x9F04
 _hookStart:
 .word 0x0023
 _hookEnd:
