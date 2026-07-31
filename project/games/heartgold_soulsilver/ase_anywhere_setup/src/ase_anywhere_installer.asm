@@ -1,32 +1,40 @@
 .arch armv5te
 .text
 .code	32
-.thumb
+.arm
 .global start
 
 src .req                                    r0
 target .req                                 r1
 size .req                                   r2
 base .req                                   r3
-data .req                                   r4
 
 _start:
-.code	16
-.thumb_func
-push {r0-r7,lr}
+add r0,pc,#0x1
+bx r0
 
-adr r0,_data
-ldmia r0,{r1-r4}
+.thumb
+push {r0-r7}
+
+adr src,_payload
+ldr base,_data
 ldr base,[base]
+ldr target,_baseToTarget
 add target,base,target
+ldr size,_size
 swi 0xB
 
 _end:
-pop {r0-r7,pc}
+pop {r0-r7}
+mov r0,#0x1
+pop {r4, pc}
 
 .balign 4
 _data:
 .word 0x2111880                             @ base
-.word 0x23AB000                             @ src
-.word 0x9EEC                                @ offset -> target
-.word 0x99                                  @ size
+_baseToTarget:
+.word 0x9F04                                @ offset -> target
+_size:
+.word 0xF8                                  @ size
+
+_payload:
