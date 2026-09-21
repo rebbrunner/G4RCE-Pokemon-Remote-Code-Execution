@@ -6,24 +6,19 @@ _start:
 
 push {lr}
 
-ldr r0,_first_call
-blx r0
-
 ldr r0,_target
 ldr r1,_rewire
-@str r1,[r0]
+str r1,[r0]
 
-ldr r0,_second_call
+ldr r0,_hook
 blx r0
 
 pop {pc}
 
 .balign 4
-_first_call:
-.word 0x01ff82c8
-_second_call:
-.word 0x01ff81e8
+_hook:
+.word 0x2000a1c
 _target:
 .word 0x2007878
 _rewire:
-.word 0xfc6af3b8
+.word 0xfc80f3b8

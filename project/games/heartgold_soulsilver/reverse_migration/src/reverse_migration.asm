@@ -3,7 +3,7 @@
 .code	16
 .global start
 _start:
-push {r0-r7, lr}
+push {r0-r1}
 
 @ only check for one pokemon
 mov r0,#0x1
@@ -16,7 +16,8 @@ ldr r1,_poke_id_loc
 strh r0,[r1]
 
 _end:
-pop {r0-r7,pc}
+pop {r0-r1}
+pop {r3-r7,pc}
 
 .balign 4
 _data:
@@ -26,4 +27,4 @@ _num_checks_loc:
 _poke_id_loc:
 .word 0x2231976               @ which pokemon to copy over
 _poke_id:
-.word 0x96                    @ Mew
+.word 0x9600                  @ Mew
