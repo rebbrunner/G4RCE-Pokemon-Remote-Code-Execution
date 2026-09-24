@@ -3,6 +3,11 @@
 .code	32
 .global start
 _start:
+
+@ switch to thumb
+add r0, pc, #0x1
+bx r0
+
 push {r0-r2}
 
 @ copy payload to ununsed space
