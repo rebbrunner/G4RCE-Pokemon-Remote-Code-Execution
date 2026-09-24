@@ -3,7 +3,6 @@
 .code	32
 .global start
 _start:
-.thumb
 push {r0-r2}
 
 @ copy payload to ununsed space
@@ -20,7 +19,6 @@ str r1,[r0]
 _end:
 pop {r0-r2}
 
-.arm
 mov r0,#0x1
 pop {r4,pc}
 
