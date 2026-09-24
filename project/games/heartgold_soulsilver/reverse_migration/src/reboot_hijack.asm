@@ -9,7 +9,7 @@ push {r0-r2}
 @ copy payload to ununsed space
 adr r0,_data
 ldr r1,_dest
-mov r2,#0x80
+mov r2,#0x40
 swi 0xb
 
 @ rewire reboot to call function in unused space
