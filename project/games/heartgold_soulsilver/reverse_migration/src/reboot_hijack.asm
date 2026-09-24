@@ -1,9 +1,10 @@
 .arch armv5te
 .text
-.code	16
+.code	32
 .global start
 _start:
-push {r0-r7, lr}
+.thumb
+push {r0-r2}
 
 @ copy payload to ununsed space
 adr r0,_data
@@ -17,7 +18,11 @@ ldr r1,_rewire
 str r1,[r0]
 
 _end:
-pop {r0-r7,pc}
+pop {r0-r2}
+
+.arm
+mov r0,#0x1
+pop {r4,pc}
 
 .balign 4
 _dest:
