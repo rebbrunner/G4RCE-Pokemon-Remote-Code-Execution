@@ -1,0 +1,21 @@
+@ Performs an overlay hijack to bootstrap overlay load to speedup
+
+.arch armv5te
+.text
+.code	32
+.global start
+_start:
+
+push {lr}
+
+ldr r0,_target
+ldr r1,_rewire
+str r1,[r0]
+
+pop {pc}
+
+.balign 4
+_target:
+.word 0x2007878
+_rewire:
+.word 0xfc60f3b8

@@ -1,6 +1,6 @@
 .arch armv5te
 .text
-.code	32
+.code	16
 .thumb
 .global start
 
@@ -10,16 +10,48 @@ dest .req                           r2
 data .req                           r3
 
 _start:
-.code	16
-.thumb_func
 
-push {r0-r7,lr}
+push {r0-r7}
 
 @ load base address
 adr src,_data
 ldr base,[src]
 ldr base,[base]
-add src,#0x4
+
+@ check if in battle
+ldr dest,_inBattleCheckLoc
+ldrh dest,[dest]
+ldr data,_inBattleVal
+ldr src,_capLoc
+cmp dest,data
+beq _uncapOn
+b _uncapOff
+
+_uncapOff:
+
+ldr data,_uncapOffVal
+
+@ Check if value is on already, otherwise skip
+ldrh r4,[src]
+cmp r4,data
+beq _copySpeedups
+
+strh data,[src]
+
+b _copySpeedups
+
+_uncapOn:
+ldr data,_uncapOnVal
+
+@ Check if value is off already, otherwise skip
+ldrh r4,[src]
+cmp r4,#0x0
+beq _copySpeedups
+
+strh data,[src]
+
+_copySpeedups:
+adr src,_instantTextAndHP
 
 _loop:
 ldr dest,[src]
@@ -33,13 +65,28 @@ add src,#0x8
 b _loop
 
 _end:
-pop {r0-r7,pc}
+pop {r0-r7}
+pop {r3,r4,r5,r6,r7,pc}
 
 .balign 4
 _data:
 .word 0x2111880                     @ base address
 
-@ 280E0002 00000000
+_inBattleCheckLoc:
+.word 0x2247612
+_capLoc:
+.word 0x2000E28
+_uncapOffVal:
+.word 0x6325
+_uncapOnVal:
+.word 0x0000
+_inBattleVal:
+.word 0x2801
+
+_instantTextAndHP:
+@ 805A2602 201C0000
+@ 8E5A2602 201C0000
+@ 50170802 211C0000
 @ 46230002 00210000
 @ EE020202 0C1C0000
 @ F0020202 18480000
